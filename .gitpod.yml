@@ -1,13 +1,25 @@
+image:
+  file: .gitpod.Dockerfile
 ports:
     - port: 3000
-      onOpen: open-browser
+      onOpen: open-preview
+      visibility: public
+    - port: 3306
+      onOpen: ignore
+      visibility: public
 tasks:
-    - init: >
-        npm install &&
-        cp .env.example .env
+    - init: |
+        cp .env.example .env &&
+        pipenv install  &&
+        mysql -u root -e "CREATE DATABASE example" &&
+        pipenv run init &&
+        pipenv run migrate &&
+        pipenv run upgrade;
       command: >
-        python docs/assets/greeting.py
+        pipenv run start;
+    - command: python3 welcome.py
+      openMode: split-right
 
-vscode:
-  extensions:
-    - esbenp.prettier-vscode
+github:
+  prebuilds:
+    main: false
